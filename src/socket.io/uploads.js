@@ -20,6 +20,7 @@ const methodToFunc = {
     'user.updateCover': user_1.default.updateCover,
     'groups.cover.update': groups_1.default.cover.update,
 };
+const metaConfig = meta_1.default.config;
 const inProgress = {};
 const uploads = {
     upload: function (socket, data) {
@@ -34,7 +35,7 @@ const uploads = {
             socketUploads[method].imageData += data.chunk;
             try {
                 const maxSize = data.params.method === 'user.uploadCroppedPicture' ?
-                    meta_1.default.config.maximumProfileImageSize : meta_1.default.config.maximumCoverImageSize;
+                    metaConfig.maximumProfileImageSize : metaConfig.maximumCoverImageSize;
                 const size = image_1.default.sizeFromBase64(socketUploads[method].imageData);
                 if (size > maxSize * 1024) {
                     throw new Error(`[[error:file-too-big, ${maxSize}]]`);

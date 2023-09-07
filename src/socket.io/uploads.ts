@@ -14,6 +14,14 @@ const methodToFunc: { [key: string]: UploadFunction } = {
     'groups.cover.update': socketGroup.cover.update as UploadFunction,
 };
 
+interface MetaConfig {
+    maximumProfileImageSize: number;
+    maximumCoverImageSize: number;
+    // Add other properties if needed
+}
+
+const metaConfig: MetaConfig = meta.config;
+
 interface Uploads {
     upload: (socket: { uid: string; id: string }, data: {
         params: {
@@ -44,7 +52,7 @@ const uploads: Uploads = {
 
         try {
             const maxSize: number = data.params.method === 'user.uploadCroppedPicture' ?
-                meta.config.maximumProfileImageSize : meta.config.maximumCoverImageSize;
+                metaConfig.maximumProfileImageSize : metaConfig.maximumCoverImageSize;
             const size: number = image.sizeFromBase64(socketUploads[method].imageData);
 
             if (size > maxSize * 1024) {
