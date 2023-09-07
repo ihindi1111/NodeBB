@@ -17,19 +17,19 @@ const methodToFunc: { [key: string]: UploadFunction } = {
 interface MetaConfig {
     maximumProfileImageSize: number;
     maximumCoverImageSize: number;
-    // Add other properties if needed
 }
 
-const metaConfig: MetaConfig = meta.config;
+const metaConfig = meta.config as MetaConfig;
 
 interface Uploads {
-    upload: (socket: { uid: string; id: string }, data: {
+    upload: (
+        socket: { uid: string; id: string }, data: {
         params: {
             method: keyof typeof methodToFunc;
             size: number;
             imageData: string;
         };
-        chunk: string; // Add the 'chunk' property here
+        chunk: string;
     }) => Promise<unknown>;
     clear: (sid: string) => void;
 }
