@@ -1,6 +1,4 @@
 "use strict";
-// The next line calls a function in a module that has not been updated to TS yet
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10,19 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const socketUser = require('./user');
-const socketGroup = require('./groups');
-const image = require('../image');
-const meta = require('../meta');
-const inProgress = {};
-const methodToFunc = {
-    'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
-    'user.updateCover': socketUser.updateCover,
-    'groups.cover.update': socketGroup.cover.update,
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+const user_1 = __importDefault(require("./user"));
+const groups_1 = __importDefault(require("./groups"));
+const image_1 = __importDefault(require("../image"));
+const meta_1 = __importDefault(require("../meta"));
+const inProgress = {};
 const uploads = {
     upload: function (socket, data) {
         return __awaiter(this, void 0, void 0, function* () {
+            const methodToFunc = {
+                'user.uploadCroppedPicture': user_1.default.uploadCroppedPicture,
+                'user.updateCover': user_1.default.updateCover,
+                'groups.cover.update': groups_1.default.cover.update,
+            };
             if (!socket.uid || !data || !data.chunk ||
                 !data.params || !data.params.method || !methodToFunc.hasOwnProperty(data.params.method)) {
                 throw new Error('[[error:invalid-data]]');
@@ -34,8 +35,8 @@ const uploads = {
             socketUploads[method].imageData += data.chunk;
             try {
                 const maxSize = data.params.method === 'user.uploadCroppedPicture' ?
-                    meta.config.maximumProfileImageSize : meta.config.maximumCoverImageSize;
-                const size = image.sizeFromBase64(socketUploads[method].imageData);
+                    meta_1.default.config.maximumProfileImageSize : meta_1.default.config.maximumCoverImageSize;
+                const size = image_1.default.sizeFromBase64(socketUploads[method].imageData);
                 if (size > maxSize * 1024) {
                     throw new Error(`[[error:file-too-big, ${maxSize}]]`);
                 }

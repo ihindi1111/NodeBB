@@ -1,44 +1,30 @@
-// The next line calls a function in a module that has not been updated to TS yet
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-
-import * as socketUser from './user';
-import * as socketGroup from './groups';
-import * as image from '../image';
-import * as meta from '../meta';
+import socketUser from './user';
+import socketGroup from './groups';
+import image from '../image';
+import meta from '../meta';
 
 interface Uploads {
-    upload: (socket: SocketType, data: DataType) => Promise<ResponseType>;
+    upload: (socket: { uid: string; id: string }, data: {
+        chunk: string;
+        params: {
+            method: 'user.uploadCroppedPicture' | 'user.updateCover' | 'groups.cover.update';
+            size: number;
+            imageData: string;
+        }
+    }) => Promise<any>;
     clear: (sid: string) => void;
 }
 
-type SocketType = {
-    uid: string;
-    id: string;
-};
-
-type DataType = {
-    chunk: string;
-    params: {
-        method: string;
-        size: number;
-        imageData: string;
-    };
-};
-
-const inProgress: { [key: string]: any } = {};
-
-interface MethodToFunc {
-    [key: string]: (socket: SocketType, params: any) => Promise<ResponseType>;
-}
-
-const methodToFunc: MethodToFunc = {
-    'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
-    'user.updateCover': socketUser.updateCover,
-    'groups.cover.update': socketGroup.cover.update,
-};
+const inProgress: { [key: string]: { [key: string]: { imageData: string } } } = {};
 
 const uploads: Uploads = {
-    upload: async function (socket: any, data: any): Promise<any> {
+    upload: async function (socket, data): Promise<any> {
+        const methodToFunc: { [key: string]: (socket: any, params: any) => Promise<any> } = {
+            'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
+            'user.updateCover': socketUser.updateCover,
+            'groups.cover.update': socketGroup.cover.update,
+        };
+
         if (!socket.uid || !data || !data.chunk ||
             !data.params || !data.params.method || !methodToFunc.hasOwnProperty(data.params.method)) {
             throw new Error('[[error:invalid-data]]');
