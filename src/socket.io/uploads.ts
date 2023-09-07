@@ -3,34 +3,33 @@ import socketGroup from './groups';
 import image from '../image';
 import meta from '../meta';
 
+type UploadFunction = (socket: { uid: string; id: string }, params: {
+    size: number;
+    imageData: string;
+}) => Promise<unknown>;
+
+const methodToFunc: { [key: string]: UploadFunction } = {
+    'user.uploadCroppedPicture': socketUser.uploadCroppedPicture as UploadFunction,
+    'user.updateCover': socketUser.updateCover as UploadFunction,
+    'groups.cover.update': socketGroup.cover.update as UploadFunction,
+};
+
 interface Uploads {
     upload: (socket: { uid: string; id: string }, data: {
-        chunk: string;
         params: {
-            method: 'user.uploadCroppedPicture' | 'user.updateCover' | 'groups.cover.update';
+            method: keyof typeof methodToFunc;
             size: number;
             imageData: string;
-        }
-    }) => Promise<any>;
+        };
+        chunk: string; // Add the 'chunk' property here
+    }) => Promise<unknown>;
     clear: (sid: string) => void;
 }
 
 const inProgress: { [key: string]: { [key: string]: { imageData: string } } } = {};
 
-// Define types for the functions in methodToFunc
-type UploadFunction = (socket: { uid: string; id: string }, params: {
-    size: number;
-    imageData: string;
-}) => Promise<any>;
-
-const methodToFunc: { [key: string]: UploadFunction } = {
-    'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
-    'user.updateCover': socketUser.updateCover,
-    'groups.cover.update': socketGroup.cover.update,
-};
-
 const uploads: Uploads = {
-    upload: async function (socket, data): Promise<any> {
+    upload: async function (socket, data) {
         if (!socket.uid || !data || !data.chunk ||
             !data.params || !data.params.method || !methodToFunc.hasOwnProperty(data.params.method)) {
             throw new Error('[[error:invalid-data]]');
@@ -70,3 +69,4 @@ const uploads: Uploads = {
 };
 
 export = uploads;
+
