@@ -35,8 +35,8 @@ const uploads: Uploads = {
             throw new Error('[[error:invalid-data]]');
         }
 
-        inProgress[socket.id] = inProgress[socket.id] || Object.create(null);
-        const socketUploads = inProgress[socket.id];
+        const socketUploads = (inProgress[socket.id] || Object.create(null)) as
+        { [key: string]: { imageData: string } };
         const { method } = data.params;
 
         socketUploads[method] = socketUploads[method] || { imageData: '' };
@@ -45,7 +45,7 @@ const uploads: Uploads = {
         try {
             const maxSize = data.params.method === 'user.uploadCroppedPicture' ?
                 meta.config.maximumProfileImageSize : meta.config.maximumCoverImageSize;
-            const size = image.sizeFromBase64(socketUploads[method].imageData);
+            const size: number = image.sizeFromBase64(socketUploads[method].imageData);
 
             if (size > maxSize * 1024) {
                 throw new Error(`[[error:file-too-big, ${maxSize}]]`);

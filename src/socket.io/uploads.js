@@ -28,8 +28,7 @@ const uploads = {
                 !data.params || !data.params.method || !methodToFunc.hasOwnProperty(data.params.method)) {
                 throw new Error('[[error:invalid-data]]');
             }
-            inProgress[socket.id] = inProgress[socket.id] || Object.create(null);
-            const socketUploads = inProgress[socket.id];
+            const socketUploads = (inProgress[socket.id] || Object.create(null));
             const { method } = data.params;
             socketUploads[method] = socketUploads[method] || { imageData: '' };
             socketUploads[method].imageData += data.chunk;
