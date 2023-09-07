@@ -17,14 +17,20 @@ interface Uploads {
 
 const inProgress: { [key: string]: { [key: string]: { imageData: string } } } = {};
 
+// Define types for the functions in methodToFunc
+type UploadFunction = (socket: { uid: string; id: string }, params: {
+    size: number;
+    imageData: string;
+}) => Promise<any>;
+
+const methodToFunc: { [key: string]: UploadFunction } = {
+    'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
+    'user.updateCover': socketUser.updateCover,
+    'groups.cover.update': socketGroup.cover.update,
+};
+
 const uploads: Uploads = {
     upload: async function (socket, data): Promise<any> {
-        const methodToFunc: { [key: string]: (socket: any, params: any) => Promise<any> } = {
-            'user.uploadCroppedPicture': socketUser.uploadCroppedPicture,
-            'user.updateCover': socketUser.updateCover,
-            'groups.cover.update': socketGroup.cover.update,
-        };
-
         if (!socket.uid || !data || !data.chunk ||
             !data.params || !data.params.method || !methodToFunc.hasOwnProperty(data.params.method)) {
             throw new Error('[[error:invalid-data]]');
@@ -58,7 +64,7 @@ const uploads: Uploads = {
         }
     },
 
-    clear: function (sid: string): void {
+    clear: function (sid): void {
         delete inProgress[sid];
     },
 };
