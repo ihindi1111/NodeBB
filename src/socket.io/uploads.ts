@@ -43,7 +43,7 @@ const uploads: Uploads = {
         socketUploads[method].imageData += data.chunk;
 
         try {
-            const maxSize = data.params.method === 'user.uploadCroppedPicture' ?
+            const maxSize: number = data.params.method === 'user.uploadCroppedPicture' ?
                 meta.config.maximumProfileImageSize : meta.config.maximumCoverImageSize;
             const size: number = image.sizeFromBase64(socketUploads[method].imageData);
 
